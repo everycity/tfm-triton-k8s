@@ -49,7 +49,7 @@ runcmd:
 
  # Initialise metallb ingress
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
- - kubectl apply -f /var/tmp/metallb-conf.yaml
+# - kubectl apply -f /root/metallb-conf.yaml
 
  # Initialise rook storage
  - git clone --single-branch --branch release-1.2 https://github.com/rook/rook.git /var/tmp/rook
@@ -223,7 +223,7 @@ write_files:
   - path: /var/tmp/k8s-init.in
     content: |
 
-  - path: /var/tmp/metallb-conf.yaml
+  - path: /root/metallb-conf.yaml
     content: |
       apiVersion: v1
       kind: ConfigMap
@@ -236,7 +236,7 @@ write_files:
           - name: default
             protocol: layer2
             addresses:
-            - 185.194.89.129-185.194.89.139
+            - 185.194.89.XXX-185.194.89.YYY
   - path: /var/tmp/rook-conf.yaml
     content: |
       apiVersion: ceph.rook.io/v1
