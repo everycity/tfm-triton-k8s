@@ -1,6 +1,7 @@
 data "template_file" "cc-k8s-master" {
     template = "${file("${path.module}/g2-ubuntu18-k8s-master.tpl")}"
     vars = {
+      metallb_range = "${var.metallb_range}"
       kubernetes_version = "${var.kubernetes_version}"
       calico_version = "${var.calico_version}"
       metallb_version = "${var.metallb_version}"
@@ -15,6 +16,7 @@ data "template_file" "cc-k8s-master" {
 data "template_file" "cc-k8s-worker" {
     template = "${file("${path.module}/g2-ubuntu18-k8s-worker.tpl")}"
     vars = {
+      metallb_range = "${var.metallb_range}"
       kubernetes_version = "${var.kubernetes_version}"
       calico_version = "${var.calico_version}"
       metallb_version = "${var.metallb_version}"

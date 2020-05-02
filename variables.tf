@@ -4,6 +4,12 @@ variable "project_name" {
   type = "string"
 }
 
+# MetalLB needs to know the IP range it can use - takes the format:
+# x.x.x.x-y.y.y.y, e.g. 1.1.2.2-1.1.3.3
+variable "metallb_range" {
+  type = "string"
+}
+
 ###
 ## Versions Of Stuff
 ###

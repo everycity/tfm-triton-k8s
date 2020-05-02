@@ -86,18 +86,7 @@ runcmd:
  # Initialise metallb ingress
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/namespace.yaml
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/metallb.yaml
-# Left as an exercise for the user
-# - kubectl apply -f /root/metallb-conf.yaml
-
- # Initialise rook storage
- - wget -O /var/tmp/rook.zip https://github.com/rook/rook/archive/v${rook_version}.zip
- - unzip /var/tmp/rook.zip -d /var/tmp
- - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/common.yaml
- - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/operator.yaml
- - kubectl create -f /var/tmp/rook-conf.yaml
- - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/filesystem.yaml
- - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
- - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/toolbox.yaml
+ - kubectl apply -f /var/tmp/metallb-conf.yaml
 
  # Initialise Kured for automatic safe reboots of the cluster
  - wget -O /var/tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
@@ -255,10 +244,7 @@ write_files:
       }
   - path: /var/tmp/k8s-init.in
     content: |
-
- # CHANGEME!! Change the 185.194 range below. You will need to allocate
- # This from our IP Asset Database. Speak to Alasdair, Andrzej or JT.
-  - path: /root/metallb-conf.yaml
+  - path: /var/tmp/metallb-conf.yaml
     content: |
       apiVersion: v1
       kind: ConfigMap
@@ -271,7 +257,7 @@ write_files:
           - name: default
             protocol: layer2
             addresses:
-            - 185.194.89.XXX-185.194.89.YYY
+            - ${metallb_range}
   - path: /var/tmp/rook-conf.yaml
     content: |
       apiVersion: ceph.rook.io/v1
@@ -322,6 +308,21 @@ write_files:
         TOOLS_POD=$(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
         kubectl -n rook-ceph exec -it $TOOLS_POD -- ceph $@
       }
+  - path: /root/setup-rook.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+
+      # Initialise rook storage
+      wget -O /var/tmp/rook.zip https://github.com/rook/rook/archive/v${rook_version}.zip
+      unzip /var/tmp/rook.zip -d /var/tmp
+      kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/common.yaml
+      kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/operator.yaml
+      kubectl create -f /var/tmp/rook-conf.yaml
+      kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/filesystem.yaml
+      kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+      kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/toolbox.yaml
+
 
 users:
   - name: everycity

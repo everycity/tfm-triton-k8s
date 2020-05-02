@@ -16,6 +16,13 @@ It installs:
 - Kubernetes Dashboard
 - Weaveworks Kured for automatic cluster reboots post-os-updates
 
+## Setup Instructions
+1. You need a project name (e.g. test), and a MetalLB IP range (ask your network admin for this)
+1. Run terraform apply, and it will create 1 master node and 3 worker nodes
+1. The setup procedure involves performing updates, and doing a reboot, and continuing setup. So setup takes some time - be patient and check /var/log/cloud-init-output.log to see progress
+1. After setup is complete, cat /root/kubernetes-init.log on the master node to obtain the worker kubeadm join command. Run this in sequence on the 3 worker nodes.
+1. Once "kubectl get nodes -o wide" shows all nodes as "Ready", you can set up Rook by running "/root/setup-rook.sh"
+
 ## Notes
 
 - Versions for Kubernetes, Calico, Rook, Ceph, etc, can be found in versions.auto.tfvars - you may wish to adjust these.
