@@ -46,9 +46,9 @@ packages:
  - containerd.io
 
 # Kubernetes
- - kubelet
- - kubeadm
- - kubectl
+ - kubelet=${kubernetes_version}-00
+ - kubeadm=${kubernetes_version}-00
+ - kubectl=${kubernetes_version}-00
 
 # Run stuff
 runcmd:
@@ -186,12 +186,13 @@ write_files:
   - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
     content: |
       [Timer]
+      OnCalendar=
       OnCalendar=*-*-* 2:00
       RandomizedDelaySec=4h
 
   - path: /etc/apt/apt.conf.d/80everycity
     content: |
-      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot "false";
   - path: /etc/docker/daemon.json
     content: |
       {

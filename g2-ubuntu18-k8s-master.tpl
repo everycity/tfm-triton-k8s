@@ -46,9 +46,9 @@ packages:
  - containerd.io
 
 # Kubernetes
- - kubelet
- - kubeadm
- - kubectl
+ - kubelet=${kubernetes_version}-00
+ - kubeadm=${kubernetes_version}-00
+ - kubectl=${kubernetes_version}-00
 
 # Run commands and stuff
 runcmd:
@@ -81,23 +81,24 @@ runcmd:
  - chown $(id -u):$(id -g) $HOME/.kube/config
 
  # Initialise calico networking
- - kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+ - kubectl apply -f https://docs.projectcalico.org/v${calico_version}/manifests/calico.yaml
 
  # Initialise metallb ingress
- - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
+ - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/metallb.yaml
 # Left as an exercise for the user
 # - kubectl apply -f /root/metallb-conf.yaml
 
  # Initialise rook storage
- - git clone --single-branch --branch release-1.2 https://github.com/rook/rook.git /var/tmp/rook
- - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/common.yaml
- - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/operator.yaml
+ - wget -O /var/tmp/rook.zip https://github.com/rook/rook/archive/v${rook_version}.zip
+ - unzip /var/tmp/rook.zip -d /tmp
+ - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/common.yaml
+ - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/operator.yaml
  - kubectl create -f /var/tmp/rook-conf.yaml
- - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/filesystem.yaml
- - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+ - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/filesystem.yaml
+ - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
 
  # Initialise Kured for automatic safe reboots of the cluster
- - wget -O /tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/1.3.0/kured-1.3.0-dockerhub.yaml
+ - wget -O /tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
  - echo "            - --reboot-days sat,sun" >> /tmp/kured.yaml
  - echo "            - --start-time 2am" >> /tmp/kured.yaml
  - echo "            - --end-time 8am" >> /tmp/kured.yaml
@@ -105,12 +106,12 @@ runcmd:
  - kubectl apply -f /tmp/kured.yaml
 
  # Initialise the Kubernetes Dashboard
- - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+ - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v${dashboard_version}/aio/deploy/recommended.yaml
  - kubectl apply -f /tmp/dash-user.yaml
  - kubectl apply -f /tmp/dash-cb.yaml
 
  # Get helm
- - wget -O- -q https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar -C /tmp/ -zxf-
+ - wget -O- -q https://get.helm.sh/helm-v${helm_version}-linux-amd64.tar.gz | tar -C /tmp/ -zxf-
  - mv /tmp/linux-amd64/helm /usr/local/bin/
  - /usr/local/bin/helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
@@ -278,7 +279,7 @@ write_files:
       spec:
         cephVersion:
           # For the latest ceph images, see https://hub.docker.com/r/ceph/ceph/tags
-          image: ceph/ceph:v14.2
+          image: ceph/ceph:v${ceph_version}
         dataDirHostPath: /var/lib/rook
         mon:
           count: 3
