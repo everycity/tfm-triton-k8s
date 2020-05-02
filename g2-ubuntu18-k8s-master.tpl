@@ -84,7 +84,7 @@ runcmd:
  - kubectl apply -f https://docs.projectcalico.org/v${calico_version}/manifests/calico.yaml
 
  # Initialise metallb ingress
- - kubectl create namespace metallb-system
+ - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/namespace.yaml
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/metallb.yaml
 # Left as an exercise for the user
 # - kubectl apply -f /root/metallb-conf.yaml

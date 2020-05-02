@@ -21,7 +21,7 @@ It installs:
 - Versions for Kubernetes, Calico, Rook, Ceph, etc, can be found in versions.auto.tfvars - you may wish to adjust these.
 - This installs Kubernetes on the hosts, but you'll need to join the workers to the master. Check /root/kubernetes-init.log after install on the master for the command to run to do this.
 - MetalLB will require you to enable IP Spoofing on the interfaces within Triton to work properly.
-- Triton Cloud Firewall isn't enabled on the instances. A basic firewall.tf has been included, but may need more work to function correctly.
+- It can take over 20 minutes for the cluster to stablise after being created (in particular for Rook and Ceph to do its thing) - be patient and check "kubectl get pods --all-namespaces"
 
 ## MetalLB
 
