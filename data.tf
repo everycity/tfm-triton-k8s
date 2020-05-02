@@ -1,5 +1,5 @@
 data "template_file" "cc-k8s-master" {
-    template = "${path.module}/g2-ubuntu18-k8s-master.tpl"
+    template = "${file("${path.module}/g2-ubuntu18-k8s-master.tpl")}"
     vars = {
       kubernetes_version = "${var.kubernetes_version}"
       calico_version = "${var.calico_version}"
@@ -13,7 +13,7 @@ data "template_file" "cc-k8s-master" {
 }
 
 data "template_file" "cc-k8s-worker" {
-    template = "${path.module}/g2-ubuntu18-k8s-worker.tpl"
+    template = "${file("${path.module}/g2-ubuntu18-k8s-worker.tpl")}"
     vars = {
       kubernetes_version = "${var.kubernetes_version}"
       calico_version = "${var.calico_version}"

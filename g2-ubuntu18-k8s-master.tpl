@@ -235,6 +235,7 @@ write_files:
   - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
     content: |
       [Timer]
+      OnCalendar=
       OnCalendar=*-*-* 2:00
       RandomizedDelaySec=4h
   - path: /etc/apt/apt.conf.d/80everycity

@@ -1,3 +1,12 @@
+# Since we could have multiple k8s environments per Triton account, we need
+# a way of differentiating them
+variable "project_name" {
+  type = "string"
+}
+
+###
+## Versions Of Stuff
+###
 variable "kubernetes_version" {
   type = "string"
 }
