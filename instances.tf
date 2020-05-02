@@ -13,7 +13,7 @@ resource "triton_machine" "k8s-master" {
 
   affinity = ["role!=k8s"]
 
-  cloud_config = "${data.local_file.cc-k8s-master.content}"
+  cloud_config = "${data.template_file.cc-k8s-master.content}"
 
   lifecycle {
     ignore_changes = [
@@ -38,6 +38,6 @@ resource "triton_machine" "k8s-worker" {
 
   affinity = ["role!=k8s"]
 
-  cloud_config = "${data.local_file.cc-k8s-worker.content}"
+  cloud_config = "${data.template_file.cc-k8s-worker.content}"
 }
 
