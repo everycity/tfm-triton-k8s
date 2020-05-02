@@ -17,30 +17,15 @@ It installs:
 - Weaveworks Kured for automatic cluster reboots post-os-updates
 
 ## Setup Instructions
-1. You need a project name (e.g. test), and a MetalLB IP range (ask your network admin for this)
-1. Run terraform apply, and it will create 1 master node and 3 worker nodes
+
+1. Terraform does most of the work. You need Terraform 0.11 for Triton, 0.12 isn't supported yet. Run "terraform apply"
+1. You can customise the versions of the software installed by editing versions.auto.tfvars
+1. You'll need to supply project_name and metallb_range variables, Terraform will ask for these. For the MetalLB range, ask IT Support.
 1. The setup procedure involves performing updates, and doing a reboot, and continuing setup. So setup takes some time - be patient and check /var/log/cloud-init-output.log to see progress
 1. After setup is complete, cat /root/kubernetes-init.log on the master node to obtain the worker kubeadm join command. Run this in sequence on the 3 worker nodes.
 1. Once "kubectl get nodes -o wide" shows all nodes as "Ready", you can set up Rook by running "/root/setup-rook.sh"
-
-## Notes
-
-- Versions for Kubernetes, Calico, Rook, Ceph, etc, can be found in versions.auto.tfvars - you may wish to adjust these.
-- This installs Kubernetes on the hosts, but you'll need to join the workers to the master. Check /root/kubernetes-init.log after install on the master for the command to run to do this.
-- MetalLB will require you to enable IP Spoofing on the interfaces within Triton to work properly.
-- It can take over 20 minutes for the cluster to stablise after being created (in particular for Rook and Ceph to do its thing) - be patient and check "kubectl get pods --all-namespaces"
-
-## MetalLB
-
-It is necessary for you to supply MetalLB with a ConfigMap. A default one has been supplied under /root/metallb-conf.yml
-
-Please edit this file supplying the IP range you wish to use (speak to your network administrator), and run:
-
-```
-kubectl apply -f /root/metallb-conf.yaml
-```
-
-You will also need to enable IP Spoofing on the Interfaces within Triton for these IPs to work as Triton will filter out any traffic from unknown IP addresses as a security precaution.
+1. You can follow the Rook setup with "watch kubectl get pods --namespace=rook-ceph"
+1. Lastly, for MetalLB to work, you'll need to enable IP Spoofing on the interfaces within Triton. Ask IT support for help with this.
 
 ## Rook
 
@@ -54,4 +39,6 @@ It may be worth running a mix of Ceph RBD (RADOS Block Device) for RWO and CephF
 The Ceph toolbox is quite useful, please see:
 
 https://github.com/rook/rook/blob/master/Documentation/ceph-toolbox.md
+
+There is a bash function to call out to the Ceph toolbox POD, so "ceph status" will work from the master node.
 
