@@ -84,6 +84,7 @@ runcmd:
  - kubectl apply -f https://docs.projectcalico.org/v${calico_version}/manifests/calico.yaml
 
  # Initialise metallb ingress
+ - kubectl create namespace metallb-system
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/metallb.yaml
 # Left as an exercise for the user
 # - kubectl apply -f /root/metallb-conf.yaml
@@ -315,7 +316,7 @@ write_files:
   - path: /root/.bash_aliases
     content: |
       # Lazy Human
-      export k="kubectl"
+      alias k="kubectl"
       # Ain't nobody got time for typin' all that
       ceph() {
         TOOLS_POD=$(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
