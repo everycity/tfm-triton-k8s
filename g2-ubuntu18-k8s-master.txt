@@ -15,6 +15,42 @@ cloud_final_modules:
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#before-you-begin
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 
+# Aggressively update
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+# Install needed packages
+packages:
+# Fix time on BHYVE
+ - chrony
+
+# Standard bits n bobs
+ - apt-transport-https
+ - ca-certificates
+ - curl
+ - gnupg-agent
+ - software-properties-common
+ - unattended-upgrades
+ - unzip
+ - whois
+ - traceroute
+ - mtr-tiny
+
+# Install a newer kernel and associated packages to avoid hangs and crashes with cephfs
+ - linux-generic-hwe-18.04
+
+# Docker as our CRI
+ - docker-ce
+ - docker-ce-cli
+ - containerd.io
+
+# Kubernetes
+ - kubelet
+ - kubeadm
+ - kubectl
+
+# Run commands and stuff
 runcmd:
  # Partition the system
  - swapoff -a
@@ -71,6 +107,7 @@ runcmd:
  # Deal with HOME not being set right
  - mv /.kube /root/
 
+# Remove swap, sort out disks
 swap:
 
 disk_setup:
@@ -81,6 +118,7 @@ mounts:
  - [ swap ]
  - [ vdb, null ]
 
+# All kids love apt
 apt:
   sources:
     kubernetes:
@@ -171,29 +209,6 @@ apt:
         =0YYh
         -----END PGP PUBLIC KEY BLOCK-----
 
-packages:
- - chrony
- - apt-transport-https
- - ca-certificates
- - curl
- - gnupg-agent
- - software-properties-common
- - unattended-upgrades
- - unzip
- - whois
- - traceroute
- - mtr-tiny
- - docker-ce=5:19.03.4~3-0~ubuntu-bionic
- - docker-ce-cli=5:19.03.4~3-0~ubuntu-bionic
- - containerd.io=1.2.10-3
- - kubelet
- - kubeadm
- - kubectl
-
-package_update: true
-package_upgrade: true
-package_reboot_if_required: true
-
 write_files:
   - path: /etc/apt/apt.conf.d/10periodic
     content: |
@@ -267,8 +282,7 @@ users:
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDo3JRaBbWiQ6QE/GGdnIH+BGMYSmbYuHyoQ8E3rLTaE4sltrApT0fSP0/5vHt3ObE++/XkNMF626HguiTv9NgHh6ogw+781rwp58LYPJI7efWs+dxM4mMfPxo6vRJpBf/uLVX2sc2s2uWmn8v3beQ7RDrNbttEUsxJV53t/Vz9beRNIEwON1wkzqcJ1Buq0INz4vLKjaDMtuf16KLaQOsLQdhUMoCu2MtAUJiaaSlB474UL1NNC5nZ+MB5C6coMMPsB/b65ItdhSjxOErFJPfQm16ApyAkYjb45KyGQZ6+sBGdjdpxlckT/sk6Y+FbokhLwdqqyfgGyLULN5MK0EJYPTKPTmFUk7eXqdJprvsl/e2QEz2DvvPujgUGcyZH9EoNNBfVLcSvOjzIQg+PkyqX9jhMW43UvJ4D9KcOFsxIjORKxlTYknU6m/DRM06EVz7gIYY1ULLP5kpLW1Vc3CROyUIyl3BkWcqx7nkRY1bfvmoxCj4EWYPjYRBK6PaaLXU3HqcmWPlFFsw328y7OR0I4OrHKLnkE0iFFidjWBA2pG4mx2R84Zzg1mCNxhHultF7mpQhnp0PQOa6qP9CLIpc/zkge5qsSUvNrdUM16zIL/yr9Xn834mk12kcMdGkWj9i9Mc2qrV01rBTarP6fAm+KJqHErZFVe8jAc9eIesIEQ== al@everycity.com_2019-11-09
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPTfvbrQ+fYetDai28oITISVw5A50DPEfn24swxyy3xYRStsLdPd0Ouj9KDy6pMl7Ldsvj/1n5om7+Jd3Y8MF1sfq5O7SXf9ghRWdtShllNb9Z0omRKgimOJDEDyKo462qJghnfQQnIivKMoUC5aitIaBe1CLeYKJveQ/BiyufoZ01SsRoKFuE7LgA62cK7OnTlpksBxwjXvLLQnE0kIWMqUAfVLbApmqTwLMmiIvxh+FOa2SVYaLoxIBpfKYqLvI0PpjhGW1WZkFukjWVSIiZps0ZcNRAOvnpn22IZRzIB3/yoqE3IBg/5PeExrBPSVdAaxQzYlIMkIH0R1LmjgJby2TRWGJoTR1jiE4ZEa99VIW6HzKmLaIT54zLPonvYkfpFsl32ie4pK2xgjXE5EMCiy8mq1hw557Kbs1mcNbpyHY7zMtlW9tK/1Dj793aa/ZhG4sBdbHR5mJwQ9bUQ735KE6szB+h1RNJPFgeBJz9SfgBMAVg0/FTqtfxcgpeQyMmgPbeZNHUAq61W0VyWiJTb0a8TLzKDK9AxeVTqOlje2TYnr91IpCN0mZdyBqR5RdBoNyXQgPXqJDqCELlnLtFpbsro1MgCAFYq7yuG+X7hhT8tkak1vChENi03fd3qFM/riX3aLoyMY31IHAWqDPhCUhWd+G3QcXOEK6iuMULyw== as@everycity.com 2019-06-01 Work
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCvt8GUN9pM60FQVayWTf+dFw4y1mJg0JLvhsX0eYvd9ig7shHHwbFbLmuFQgnrJecDeQuNvWVNTOpSkzogrFSGbCOYHv7x5Kl9eqRQWF5Me6Q91noNmyiOeK6QLVZrIqyRfC970wgibfSdWRQRiolBc0Yb4kPdHLo50w/Fjh9rI8Fv7D/PiKdpZlmQyZJV5ov5mgeem+ldF+USp6IZpoEUWt0GwszzzyLQGW6q+O9KBezihNdYj7qNw79KDGAaYf3v9VqMYzCNR+2P7CZy32cXSxoO6R72a6iitgZLYNKWKH/HgaI/gBbNakTChnwubS5XzjtTRgwb3UVaVPPuXIZOrkAwzpPleiw2T0voujzqiLYGS1VGF3v6VLXfe190V151eFMVwAxbXmfbySt38vUAJyv6TaS1sC3m1yF6aiXG+4MqHdXIMzmhDIwNQRn6uilB5j4oCz30iOHjHPEQoj1xHnbUp1RPobpe+v+S/PzP3DU0jgsaGnBuwaD4xPdRy+5wBXQJN1lK3Ay7F0xHLbKSsUS20oJfCMk79SWLirxS1t19+v9sFx0pN6Xsfb22MASYevM/AyXstpiBVHxzaFN9ooxoBWBLbFL3ppizKJ4EbU96AqWFG0uF3DDcM/Xxt/Azu6+uU1HurNDyUmMtNt5m29QyYz4gBAwXMF/SkZo7GQ== jt@everycity.com_2019-01-08
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCeDtb9svHnscDUuJXud4+6kerUtK+oo9yGP5tcYAXKTieJpDBSM93E7WRCvrUL5vwduz9GYVfOEEQHT/v66DFbK6qcrj8oHBPabNdllnmGkOvH1mHlBspM34xbjMUPPOnafQYP/uqSXlYaNBZDvI8NUWhzv6dXrBoEO5Nh9E1B4MdS6tNWdZOyTRRZmk1uRyawjY7BldBh3cI19gM5uQgKJ9mof2f+q5X+rQAjIn9JihrTmGvK22MvdZrWItNqXswBG8lP2O3TslS2OtyY3LrfJW9Vl/Ce4H0EWYRytTNSmnfEY4rd/6iHNLJX/652HErTCK8Ffifaf/KN/cChTAs/DdsLOt6BbHUVq5bTf+MsDNsjfKPgr3OG6oqNon4jXEQc504NnmVVAumzAxn6QScLQqI76MrJGEyQw72Wf7aeBGJz59RT8JFjqA6VXiMmVnEdgKPNq/gks0Idea8/FH4Ko6FDcYNXTH5Y9C9l7t8f00UaxrezhoC3v+cqxxo2DXazbfkh4zhrrP14A3n4KrlPV4tBUE4SOYQffIoP5zX9woj/Pbc93evyZLHqvkDSjIvxuVTmbR54tn6rUN2idradBM4QGobCYCI+ErbSOaAoRyx31wKfs4fB9zI2NQosF7xhWJUJvnvEjnr79zyaJZrOpD0YAYF6aEGMQlF6ZCL31w== cjm@everycity.com_2019-01-08
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCpXNLVjGFf0Om54xWfMGCNXB+O4iD34FDaDWIBKLpDIIEbUaWqhoWp4/M38VBjFSlOm0Wtsea0D0rBDfwWqYgMer5KzCYrNlHXd7U04hPlOUtych46O+aUfx7m1OKGEbiwZ4PFAXMck9bu+K29m4/bnNxAHePqQb+eJRL9wYFdV65F5fO4Q20+DKQ2z0T2dWJLSeDR/CzASrdp6uSfIlvG5SuD5tdisAxv4D0pw3qxOcyHKRwX1hwqJLtpbAmXTQjtfOntsGAiVdW0fQRUH9xgMw/5OR4Bg38e204muTnrCM2i9jrkWHLX1nw51P1xjkYooMPa+ZgUOKFBJIzRCPEv7WUvy1nvQUBc229bAEcQ8CHICwKBm5gCYGO5JsiV3mahYH5VolO59nUK/nWqL8v8padGR3/kaodVMd13rGIlawouKDgCXSwAHFS1fFV5bBAmnU3w7W0vCLxVOmjhFlhqth1e7eGaWwGqIlzmQFGz4EoT2CjuAk4OdoUIVwX4/g0spX9CCCIH10wop9gwLEu9M+dPNoF4hyIJv8WoxHac5myEqOHMySoPhKDiwysbW/K+HwTB/mWIuIPym/vV7MBrxrqzmAdHdo0CJ/PakiFzg9LFFGo9Cgd2OZf5TXEz4Np2Exfuk8KI1/0XTnmjK6I5AGMTtB3WKnUuk6D+wVl2yw== jt@everycity.com_2020-01-16
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC6erlvwYGvK3y0NyK3Wuo//Z8YAcS6Nbm8TecjLSeaWRhaSel7RaYE+aRgVJZiZ/pmtw/dFpgdUdu+q9md3ITvKglBhkkV/KC1Vw4mLoWC0nwolPTRLDy/12PHUdaUdRZJU4ywdwn86YYM8yHzDFrX03s+FpWin/BbesXuXxY/BcwclLuichHMb9vh7t7t+hFWtIZE+xpHNs8PNdk5zQrF1CewUbrtz1uFEBGt1GCQ+rDdg3MKQuMT7qWZXs4K+2QMRlIIJGa42o0AkFDLIQ29dajdvEVNbaUQIFX+BMVwJBx5Zadb0y+027kP6SqG3ELHhskqWb/50l9BBGcHMWAlxZOTX53eiN51epggS//BrRtjdaLh5veIDQLmbc2BdY3IsjyrFR6ObqwJE9FVRQt8ECvO6TrxR1zF5oodt53YWRZuNSv12om90cdr0iqGwC3YMhKE5U19kggGtID08mF/L2Jw0Zj/4oh85v9LVBz8QLkTbIPxnPoHcE6n8UzOY+CU4E2Xy7AG5o9Fud82TgP8tvyuSrpQda9OiHoLBHrXV26H8iOZ214f95fXxwRA62sjBLWcOA/zcmR70q8hK9ZSXLva0Qo90Lr7UO4mzQ0JSz9LllYlpl1buce/FaHPmJD6sbMlEceIqkh6P6f9vPK2+B097levLjSvb/Ru5Xv0zQ== dw@everycity.com_2019-07-01
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDo5CR7LW/hC3TqaWPr+kp9jvGPy6YfzUMy6eYJaGQ6crnNkzvCl014/dZHqmYwXZYOETl111eZmWHd5PRlOBbGnRHKBay2HY9wGy2kUHb6rC4rdEG7eJVyrX9gLvRNHZHOIZaU2hnniKDHh3IzI7q0Egy0m2+UXVnm4DX6txxAScUAYa5GythQLEgHK33UbvQF9Zoj2G6EUoFF7ZYvEEttDXHlsjn5utc5Ejv1Cz9fS+z5DyLHZF8rei9Y+UMEJp+/tjhZDEH69q8HTFvb+ISlYZkSJHRVd2fHgH/3XTbvIGYjVlSBoSlvCK8qQMzhZWAKOMrrdHX99iL9kVl87clCiM96NYtUXtjlxnJPYgleENsSPb2VmWa7MGOsA3NLryWPgRFfrz2XM8HwmFbeUEtml123RULDjqHreejPrRzKxjVhoxzDCBzQ3uY2WDdh4GgMajMGCRzqqfelrhmQUSWtQFLYBcnc1LhE0NB1afwFqOzkqxShiqBXXL0GSvftKGpu8PtnY2E4/skqYIOM6oEkFyckBVLVHMad5ZEeUweqa5xInU2/KWXskqXo6L6tlI/QG8E5LudYXJBWPwiJl/poNELmtw5zDhal1Dhsba1OQ8d9Folx0tgzHrQ8hNM/v6MaNp84fsL5yKSGvgu7GNfzRJu7pCqe1ik7myHWh4B3pQ== jam@everycity.com_2019-07-05
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCwYaegqSlLZFSbDOKDZy2uHgb2lY0Y87zGcZL0U1FnlpbS5F8UvHfQb4Z8UYYjR2LHe9AAvEr0mBL1GIUBJCQ5M1KN39BLPp4mVTWd3fEukzee95nRErbvrTStrjtdjVZimUw0QiwiNmoJ+PGN2gk1cAOhtwsfE29fPsmrUsOBJPJhvGNImGx7O5x/feaw9k/nkEYzkep0isnFUJxbl0tzXlWXLSfCzQUWWgH7fgTPXI8Y/xJ8ko989Bf0gmxu/olL7byoQS/JBLHt9GPGOe3pN2D778Qz8tmtAnbr3Q10db4FycC5Ph/SPetcxVj0aUEeqwGPHpi9W4STVAEc/F1PB0WX9cSOfP0xwibL2TaI3PINGiyBjawM+8FMJGwy8nBKP0r0a+K7dvnKxPS//Xo8v1L0UHGnN2s/uAmIhFJ6VgDXwxxMhuBE3vcX6jWx/j5mt9DC/qql5LoAut+nC7PbRYe6iZr8GfjB7d3Za21Gwi9wL1F3USlHCgT/xRxOdSJxMTMZ8JRINgHlFeRT24vRLI/VwhpNFdmiALA3iIr+wTeKKcuH2/j6Am2+ujQyeTNNpaDh0tJRmvTv3i30FqIRguu8VDMV/yy/Vth6mlkzOGfw3+jmElCyHHwKqw8G2f+LP7/bRQthXP+e3F3eL7OYCJD/HwBwjvsjubu4mbJszw== mic@everycity.com_2019-07-22
@@ -276,4 +290,3 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7RDhJHSIOsR5whKRy4YHlUkZ/R+mqdRdMmG8CCYUrqTHmnL7NWme/h3tl6XS8gAXkDkTq4rAZ39emeFK2+YrIsywzlXfvtM86DKcdKuhqPUEsJcJIWfzzef8aGUzfLpkz/iX3QXqVftScNVSOdl3vYhhRIM2lTjjEL8IglDd9PxfJZ51tbZpHAbvbeaZkPrkDLk5AyDx2/ppc9OLxkbqU1kQMJwEeKWwgpqjUwhB8C4SdqD05H5GY1xLlYIjp6WKgVHXVPUOlJ1LQD8pBrLrpKDUw2TrFzoZNsUm7QAb5VQ2V2F5DIA0+NT9dhgAR2bmcLWEKUvsVG0XVVKfbjkidWM4IHD8XNStAB6m8MM7u62QlEaXDvX7bVdl46DnlRK3yb6GdDHGbGpl8yAZQJNNW+oJMxKhiKXDyKwDfjNvxRLmXaIH3hNLrU7KVisfYTqqkh2lnttg1PKrmU4o82Ptqcozr1ysodu1rj4lYqi1p8j6QBcy5xmt+NKlh7CQoH7Z5Lu4UmgylzzevS4DwQhpypDnNow/WjP/r7UennDgB+hoK/X70VRqXRs43gwxk484tMDJhLWMt4qbwA6NDb+zEI4f+lv+0gaG6b4A0wDr1iT9ipRIj1ndOOdebNjDz64NHSVv/KZvOf96wWDLdX+umIUWwKa/eZsW/FUwzhiESiw== h_barik_win@everycity.com_2019-07-25
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDVnicvBg3ZUIh/EbnYzecRDpfkIjWn9xFUQRYvex7jAKY3Z2AwQVNYUQW1rOFhNzET1sPwwtQoRDoAhss17/6VGcC56lrn1fsiKoPTZWzUTpmFEKQFGk3zYt2YGvNMKYQovP56LQ2CWtXjGdYxUarERGSL4ddC5ghyJuPKiNEsGbH2BEEUBVqpXuJINAoS4KcTctArVYK5almpcR3ok+xv/7Y/lFgrAuYjLI5k5P8LVvwM+oFnt3qKji4Ezfnde72GMubmypgzXpiQqGGoU/Ku0o/pfkR+PHB+Wt6rZXS2ZJh15VFgqwdrZF1yoXMaxEt4WHYJDhYTM3wouaIcGZ7MibvLduNZWMkGXnPTL4xvHlTOiugAi3bUrnzkLz0bq0zb6sIHf6QhJbwgDS9XbgqJbL99A9UnqBe/NEziaW2MNfxyN5BihXXjrGW4D56MJeM+M7dsE4Uc/X+Yju/pDJU3V5XDP3F5NWxQxRg0i+VOiwYx2QMsYazyE23ePbxFx2FWmuzJpl/foL1kKlYuhTHaa0r40f7JgGHrtSI3W25t2raPyT4A0hhus+7acjXtDO3/RlePB82/R8zjLS6mr/z9WaXbnR7i2kU2vgzt9XVffTLk5HE36hzwcCuwB9K0qsPLI1Ki1MIpQU32MQcaMcxJnIp5QscHFVcJlur8/JDnYw== ob@everycity.com_2019-08-08
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD2EMza7nJTkU1zrpu/fEyNtQTRUFPkdYKOum6C8TMnvBNAhJqqdx72WRctfLacupmCReWH4MR6/8uqljt4sPOehFoxdMIA1VJC2UiyMMc9rl79DYcmyto/OlPoOae6h7zFuTFECNUFVjuvmEsAjjc4P+sg1oWKUDJfsfVRXed+o/k5OyxjNZmWTOeqMEr6Iz5qBh2MjCKAL4IX9HCkQAPVMuoSGnDwt5dGRyvPPuYot/aFcWVOH5DdvBZ8w26+FzaU9Yi39v5vtBaqnejij7sDDDdLQ4KfOPwVXxelIRcUbNEnrpq1siphkW9f4P+hEY/zZ3YCdzdX3m9Ve5nY2eNHsOmG7IUDz2lfOCh2YUoiPCqKQ++MPx1mM1wfChiO0WDkdOuzi/bqwH/KCPwppmLMcg5SYGtnG+AiKYy3FBIKQ19TbCcIOIgIGkqXG3N9x1FsP/y3qAHjmdJAv5FVxy6NnT0tgALFtgyDQ23pT1foJW1Icgj6grr8tGtNISpuIe3LQm3myRLh1ZtXa7EnMek/SHX7osTGZEmFY91k3bg9S8HOXrBAU+cie7/9Q7OkKV7xEBSYdlEvPJYgcej7tEeAC6pqFZdbfktcmE69tzsZytL/G0mHoWDFafz6lGiVBPaIiyxSJdgUefMZHfaLwe8SpHJWklcGnuq4qYSH8yffIQ== fmj@everycity.com_2019-08-28
-      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDJ1fSXnNwKKb7c7XTdvEGZ/VYJoBLoVErB/UUIvcXIID7Eo2yVa8Z2p7JxdzhAsPqlz8YUou+LkiMSrX5Agb5wSqCwLPYdYeatiRyg2cRSSMh3Q5gtdJ6JHc/P8qnjyGBqzqyIGTBhwsxxV/u6tdhPqTlyAAceQKks4mcabvMbMWLxe0cm4WywBlVOdGI7URWr+AX/j64loQci8S8+/+f/UYzraJIEP69jRMfmS9oVrOSwJUg/eObUmqHecnGeta2zfdpkkhApDG6BksBbVlwyiRPuMIzY1oImZOWjOBR2eTnvHOFkgTYAWfugA8+jo54s4b/oM9Rn9hLXdT2hfwUNq03dzwrlqgMJ3lTvQyJrLbJWak5Qe8IWGawOzKVCesxWbo/GtxhqzB1jD1MASODHGp0NUTFA06959YX+liJ9kuxycovYPs+zHSrZBSTfkYnP1C2SzAyHU3N0n1bkUfwxIV4vY+xDqUCUCpaMlfxBnd9XOy75UtL9IPbUmi3kL48tFjPjh6eecLH0rRPoVabVGzGr7P+pcIeop0KgvUtYOvj+6YKMU9EurL+BpBGbZPHE720+RLbycmHEdAlLrqvDDYLSxjem7/eqHWGmOUf9pedeeqq7OD57MMryHU6F8rLMttV0vqQAE+QUb0F73n9JI4aS4WS48PlVnbgIDoDqRQ== rbm@everycity.com_2019-12-12
