@@ -90,25 +90,26 @@ runcmd:
 
  # Initialise rook storage
  - wget -O /var/tmp/rook.zip https://github.com/rook/rook/archive/v${rook_version}.zip
- - unzip /var/tmp/rook.zip -d /tmp
+ - unzip /var/tmp/rook.zip -d /var/tmp
  - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/common.yaml
  - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/operator.yaml
  - kubectl create -f /var/tmp/rook-conf.yaml
  - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/filesystem.yaml
  - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+ - kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/toolbox.yaml
 
  # Initialise Kured for automatic safe reboots of the cluster
- - wget -O /tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
- - echo "            - --reboot-days sat,sun" >> /tmp/kured.yaml
- - echo "            - --start-time 2am" >> /tmp/kured.yaml
- - echo "            - --end-time 8am" >> /tmp/kured.yaml
- - echo "            - --time-zone Europe/London" >> /tmp/kured.yaml
- - kubectl apply -f /tmp/kured.yaml
+ - wget -O /var/tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
+ - echo "            - --reboot-days=sun" >> /tmp/kured.yaml
+ - echo "            - --start-time=2am" >> /tmp/kured.yaml
+ - echo "            - --end-time=8am" >> /tmp/kured.yaml
+ - echo "            - --time-zone=Europe/London" >> /tmp/kured.yaml
+ - kubectl apply -f /var/tmp/kured.yaml
 
  # Initialise the Kubernetes Dashboard
  - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v${dashboard_version}/aio/deploy/recommended.yaml
- - kubectl apply -f /tmp/dash-user.yaml
- - kubectl apply -f /tmp/dash-cb.yaml
+ - kubectl apply -f /var/tmp/dash-user.yaml
+ - kubectl apply -f /var/tmp/dash-cb.yaml
 
  # Get helm
  - wget -O- -q https://get.helm.sh/helm-v${helm_version}-linux-amd64.tar.gz | tar -C /tmp/ -zxf-
@@ -290,14 +291,14 @@ write_files:
           useAllNodes: true
           useAllDevices: true
           deviceFilter: vdb
-  - path: /tmp/dash-user.yaml
+  - path: /var/tmp/dash-user.yaml
     content: |
       apiVersion: v1
       kind: ServiceAccount
       metadata:
         name: admin-user
         namespace: kubernetes-dashboard
-  - path: /tmp/dash-cb.yaml
+  - path: /var/tmp/dash-cb.yaml
     content: |
       apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRoleBinding
@@ -311,6 +312,15 @@ write_files:
       - kind: ServiceAccount
         name: admin-user
         namespace: kubernetes-dashboard
+  - path: /root/.bash_aliases
+    content: |
+      # Lazy Human
+      export k="kubectl"
+      # Ain't nobody got time for typin' all that
+      ceph() {
+        TOOLS_POD=$(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
+        kubectl -n rook-ceph exec -it $TOOLS_POD -- ceph $@
+      }
 
 users:
   - name: everycity
