@@ -6,12 +6,15 @@ Terraform code for spinning up k8s on Triton. Creates:
 
 It installs:
 
+- Ubuntu 18.04 with the 5.3 HWE Kernel (to avoid CephFS crashes)
 - Docker as the CRI
 - Calico as the CNI
 - MetalLB for Load Balancing
 - Rook, with CephFS as a storage backend
 - Helm v3.0.2 under /usr/local/bin
 - kubetail under /usr/local/bin
+- Kubernetes Dashboard
+- Weaveworks Kured for automatic cluster reboots post-os-updates
 
 ## Notes
 
