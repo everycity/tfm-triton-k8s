@@ -1,5 +1,17 @@
 #cloud-config
 
+####################
+### README FIRST ###
+####################
+#
+# Before continuing, please make sure that you update the MetalLB IP
+# range below, otherwise cluster setup will fail. You'll need to
+# allocate an IP range from the IP Address Asset Spreadsheet.
+#
+# Speak to Alasdair, JT or Andrzej for more information.
+#
+####################
+
 # Work around Canonical / Joyent missing modules
 cloud_final_modules:
  - package-update-upgrade-install
@@ -69,7 +81,7 @@ runcmd:
  - systemctl mask systemd-timesyncd.service
 
  # Sort out kubernetes and docker
- - apt-mark hold kubelet kubeadm kubectl
+ - apt-mark hold kubelet kubeadm kubectl docker-ce docker-ce-cli containerd.io
  - mkdir -p /etc/systemd/system/docker.service.d
  - systemctl daemon-reload
  - systemctl restart docker
@@ -94,6 +106,19 @@ runcmd:
  - kubectl create -f /var/tmp/rook-conf.yaml
  - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/filesystem.yaml
  - kubectl create -f /var/tmp/rook/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
+
+ # Initialise Kured for automatic safe reboots of the cluster
+ - wget -O /tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/1.3.0/kured-1.3.0-dockerhub.yaml
+ - echo "            - --reboot-days sat,sun" >> /tmp/kured.yaml
+ - echo "            - --start-time 2am" >> /tmp/kured.yaml
+ - echo "            - --end-time 8am" >> /tmp/kured.yaml
+ - echo "            - --time-zone Europe/London" >> /tmp/kured.yaml
+ - kubectl apply -f /tmp/kured.yaml
+
+ # Initialise the Kubernetes Dashboard
+ - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta8/aio/deploy/recommended.yaml
+ - kubectl apply -f /tmp/dash-user.yaml
+ - kubectl apply -f /tmp/dash-cb.yaml
 
  # Get helm
  - wget -O- -q https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz | tar -C /tmp/ -zxf-
@@ -224,7 +249,7 @@ write_files:
       RandomizedDelaySec=4h
   - path: /etc/apt/apt.conf.d/80everycity
     content: |
-      Unattended-Upgrade::Automatic-Reboot "true";
+      Unattended-Upgrade::Automatic-Reboot "false";
   - path: /etc/docker/daemon.json
     content: |
       {
@@ -238,6 +263,8 @@ write_files:
   - path: /var/tmp/k8s-init.in
     content: |
 
+ # CHANGEME!! Change the 185.194 range below. You will need to allocate
+ # This from our IP Asset Database. Speak to Alasdair, Andrzej or JT.
   - path: /root/metallb-conf.yaml
     content: |
       apiVersion: v1
@@ -262,7 +289,7 @@ write_files:
       spec:
         cephVersion:
           # For the latest ceph images, see https://hub.docker.com/r/ceph/ceph/tags
-          image: ceph/ceph:v14.2.5
+          image: ceph/ceph:v14.2
         dataDirHostPath: /var/lib/rook
         mon:
           count: 3
@@ -272,7 +299,27 @@ write_files:
           useAllNodes: true
           useAllDevices: true
           deviceFilter: vdb
-
+  - path: /tmp/dash-user.yaml
+    content: |
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: admin-user
+        namespace: kubernetes-dashboard
+  - path: /tmp/dash-cb.yaml
+    content: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: admin-user
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+      subjects:
+      - kind: ServiceAccount
+        name: admin-user
+        namespace: kubernetes-dashboard
 
 users:
   - name: everycity

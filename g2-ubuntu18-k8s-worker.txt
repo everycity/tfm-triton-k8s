@@ -69,7 +69,7 @@ runcmd:
  - systemctl mask systemd-timesyncd.service
 
  # Sort out kubernetes and docker
- - apt-mark hold kubelet kubeadm kubectl
+ - apt-mark hold kubelet kubeadm kubectl docker-ce docker-ce-cli containerd.io
  - mkdir -p /etc/systemd/system/docker.service.d
  - systemctl daemon-reload
  - systemctl restart docker
