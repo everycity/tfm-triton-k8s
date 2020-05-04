@@ -324,6 +324,9 @@ write_files:
       kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/filesystem.yaml
       kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/csi/cephfs/storageclass.yaml
       kubectl create -f /var/tmp/rook-${rook_version}/cluster/examples/kubernetes/ceph/toolbox.yaml
+      echo "Sleeping for 5 seconds then setting rook-cephfs as default storageclass"
+      sleep 5
+      kubectl patch storageclass rook-cephfs  -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
 
 users:
