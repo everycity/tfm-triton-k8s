@@ -81,7 +81,8 @@ runcmd:
  - chown $(id -u):$(id -g) $HOME/.kube/config
 
  # Initialise calico networking
- - kubectl apply -f https://docs.projectcalico.org/v${calico_version}/manifests/calico.yaml
+ - wget -q -O- https://docs.projectcalico.org/v${calico_version}/manifests/calico.yaml | sed 's/Always/Never/g' > /var/tmp/calico.yaml
+ - kubectl apply -f /var/tmp/calico.yaml
 
  # Initialise metallb ingress
  - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v${metallb_version}/manifests/namespace.yaml
