@@ -41,21 +41,21 @@ resource "triton_firewall_rule" "k8s-calico-udp" {
 }
 
 # Allow Calico L3 routed traffic ICMP
-resource "triton_firewall_rule" "k8s-calico-icmp" {
+resource "triton_firewall_rule" "k8s-calico2-icmp" {
   description = "Allow communication between k8s hosts - calico icmp"
   rule        = "FROM subnet 10.28.0.0/16 TO tag \"role\" = \"k8s-${var.project_name}\" ALLOW icmp TYPE all"
   enabled     = true
 }
 
 # Allow Calico L3 routed traffic TCP
-resource "triton_firewall_rule" "k8s-calico-tcp" {
+resource "triton_firewall_rule" "k8s-calico2-tcp" {
   description = "Allow communication between k8s hosts - calico tcp"
   rule        = "FROM subnet 10.28.0.0/16 TO tag \"role\" = \"k8s-${var.project_name}\" ALLOW tcp PORT all"
   enabled     = true
 }
 
 # Allow Calico L3 routed traffic UDP
-resource "triton_firewall_rule" "k8s-calico-udp" {
+resource "triton_firewall_rule" "k8s-calico2-udp" {
   description = "Allow communication between k8s hosts - calico udp"
   rule        = "FROM subnet 10.28.0.0/16 TO tag \"role\" = \"k8s-${var.project_name}\" ALLOW udp PORT all"
   enabled     = true
