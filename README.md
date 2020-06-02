@@ -48,40 +48,40 @@ There is a bash function to call out to the Ceph toolbox POD, so "ceph status" w
 
 During terraform plan or terraform apply, if you see the following error after entering your metallb_range and project_name...
 
-data.template_file.cc-k8s-worker: Refreshing state...
-data.template_file.cc-k8s-master: Refreshing state...
+    data.template_file.cc-k8s-worker: Refreshing state...
+    data.template_file.cc-k8s-master: Refreshing state...
 
-Error: Error refreshing state: 1 error occurred:
-	* provider.triton: 2 errors occurred:
-	* Key ID must be configured for the Triton provider
-	* Account must be configured for the Triton provider
+    Error: Error refreshing state: 1 error occurred:
+	    * provider.triton: 2 errors occurred:
+	    * Key ID must be configured for the Triton provider
+	    * Account must be configured for the Triton provider
 
 ...obtain your Triton profile details using the following command...
 
-cat ~/.triton/profiles.d/eu-staff-1.json
+    cat ~/.triton/profiles.d/eu-staff-1.json
 
 ...and then update the following variables in main.tf...
 
-{
-    "url": "",
-    "account": "",
-    "keyId": ""
-}
+    {
+        "url": "",
+        "account": "",
+        "keyId": ""
+    }
 
 ### Internal Network vlan2800 error
 
 During terraform plan or terraform apply, if you see the following error...
 
-data.triton_network.internal: Refreshing state...
+    data.triton_network.internal: Refreshing state...
 
-Error: Error refreshing state: 1 error occurred:
-	* data.triton_network.internal: 1 error occurred:
-	* data.triton_network.internal: data.triton_network.internal: no matching Network with name "vlan2800" found
+    Error: Error refreshing state: 1 error occurred:
+	    * data.triton_network.internal: 1 error occurred:
+	    * data.triton_network.internal: data.triton_network.internal: no matching Network with name "vlan2800" found
 	
 ...check that you have a triton network attached using...
 
-triton networks
+    triton networks
 
 If this does not return a private LAN, contact IT Support. Otherwise, add your vLAN to networks.tf...
 
-name = "vlan2804"
+    name = "vlan2804"
