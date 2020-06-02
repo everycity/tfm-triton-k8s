@@ -18,7 +18,7 @@ It installs:
 
 ## Setup Instructions
 
-1. Terraform does most of the work. You need Terraform 0.11 for Triton, 0.12 isn't supported yet. Run "terraform apply"
+1. Terraform does most of the work. You need Terraform 0.11 for Triton, 0.12 isn't supported yet. Run "terraform init" to start initialisation, then "terraform plan" to preview the provisioning and then "terraform apply".
 1. You can customise the versions of the software installed by editing versions.auto.tfvars
 1. You'll need to supply project_name and metallb_range variables, Terraform will ask for these. For the MetalLB range, ask IT Support.
 1. The setup procedure involves performing updates, and doing a reboot, and continuing setup. So setup takes some time - be patient and check /var/log/cloud-init-output.log to see progress
