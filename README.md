@@ -24,13 +24,13 @@ It installs:
 1. The setup procedure involves performing updates, and doing a reboot, and continuing setup. So setup takes some time - be patient and check /var/log/cloud-init-output.log to see progress
 1. After setup is complete, cat /root/kubernetes-init.log on the master node to obtain the worker kubeadm join command. Don't forget to run the following commands on the master first, as described in the output:
 
-    ``mkdir -p $HOME/.kube
-    ``sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    ``sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
     Then run the following in sequence on the 3 worker nodes to join them to master:
 
-    kubeadm join 10.x.x.x:6443 --token sometoken --discovery-token-ca-cert-hash sha256:somecertkey
+        kubeadm join 10.x.x.x:6443 --token sometoken --discovery-token-ca-cert-hash sha256:somecertkey
 
 1. **ESSENTIAL STEP** Before continuing you need to go into Triton's Admin UI and enable IP Spoofing, MAC Spoofing and Allow Restricted Traffic on both the internal and external interfaces for all 4 nodes. **Failure to complete this step will result in your cluster having network issues**
 1. Once that's done, you can set up Rook by running "/root/setup-rook.sh"
