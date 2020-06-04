@@ -33,8 +33,8 @@ It installs:
         kubeadm join 10.x.x.x:6443 --token sometoken --discovery-token-ca-cert-hash sha256:somecertkey
 
 1. **ESSENTIAL STEP** Before continuing you need to go into Triton's Admin UI and enable IP Spoofing, MAC Spoofing and Allow Restricted Traffic on both the internal and external interfaces for all 4 nodes. **Failure to complete this step will result in your cluster having network issues**
-1. Once that's done, you can set up Rook by running "/root/setup-rook.sh"
-1. You can follow the Rook setup with "watch kubectl get pods --namespace=rook-ceph"
+1. Once that's done, you can set up Rook by running "/root/setup-rook.sh" on the master node.
+1. You can follow the Rook setup with "watch kubectl get pods --namespace=rook-ceph" from the master node.
 
 ## Rook
 
