@@ -18,26 +18,48 @@ It installs:
 
 ## Setup Instructions
 
-1. Terraform does most of the work. You need Terraform 0.11 for Triton, 0.12 isn't supported yet. Run "terraform init" to start initialisation, then "terraform plan" to preview the provisioning and then "terraform apply".
+1. You'll need to supply a set of variables specific to your environment. See variables.tf and the Variables section below for more information
 1. You can customise the versions of the software installed by editing versions.auto.tfvars
-1. You'll need to supply project_name and metallb_range variables, Terraform will ask for these. For the MetalLB range, ask IT Support.
+1. Run "terraform init" to start initialisation, then "terraform plan" to preview the provisioning and then "terraform apply".
 1. The setup procedure involves performing updates, and doing a reboot, and continuing setup. So setup takes some time - be patient and check /var/log/cloud-init-output.log to see progress
-1. After setup is complete, cat /root/kubernetes-init.log on the master node to obtain the worker kubeadm join command.
+1. After setup is complete, cat /root/kubernetes-init.log on the master node to obtain the worker kubeadm join command
 
         kubeadm join 10.x.x.x:6443 --token sometoken --discovery-token-ca-cert-hash sha256:somecertkey
 
-Run the extracted join command on the 3 worker nodes.
+Run the extracted join command on the 3 worker nodes
 
 1. **ESSENTIAL STEP** Before continuing you need to go into Triton's Admin UI and enable IP Spoofing, MAC Spoofing and Allow Restricted Traffic on both the internal and external interfaces for all 4 nodes. **Failure to complete this step will result in your cluster having network issues**
-1. Once that's done, you can set up Rook by running "/root/setup-rook.sh" on the master node.
-1. You can follow the Rook setup with "watch kubectl get pods --namespace=rook-ceph" from the master node.
+1. Once that's done, you can set up Rook by running "/root/setup-rook.sh" on the master node
+1. You can follow the Rook setup with "watch kubectl get pods --namespace=rook-ceph" from the master node
+
+## Variables
+
+Variables must be specified unless there is a default.
+
+| Variable               | Default                    | Description                                                                                                            |
+|------------------------|----------------------------|------------------------------------------------------------------------------------------------------------------------|
+| dns_suffix             |                            | Cluster DNS Suffix. Used to uniquely identify this cluster, and to generate instance aliases. E.g. k8s.client.cloud.ec |
+| metallb_range          |                            | IP Range for MetalLB to use. Please speak to your network administrator. Takes the format x.x.x.x-y.y.y.y              |
+| external_network       |                            | External network name. E.g. "public"                                                                                   |
+| internal_network       |                            | Internal network name. E.g. "vlan1234"                                                                                 |
+| image                  | ubuntu-certified-18.04     | Instance image to provision with                                                                                       |
+| master_package         | g1-virtualmachine-bhyve-4G | Master node instance package type                                                                                      |
+| worker_package         | g2-virtualmachine-bhyve-8G | Worker node instance package type                                                                                      |
+| worker_count           | 3                          | Worker node instance count                                                                                             |
+| triton_ssh_private_key | ""                         | SSH Private Key used to authenticate with Triton, for use with Terraform Cloud                                         |
+
+## Triton account details
+
+You will need to edit main.tf and update the Triton provider authentication details. You can obtain these via:
+
+```
+cat ~/.triton/profiles.d/*.json
+```
 
 ## Rook
 
 ### Overview
 Rook has been chosen to provide Persistent Volume Claim support. The Cloud Config file (which can be customised) by default applies the CephFS StorageClass. This provides clustered storage and supports RWO and RWX claims.
-
-It may be worth running a mix of Ceph RBD (RADOS Block Device) for RWO and CephFS for RWX for performance reasons but this hasn't been investigated fully.
 
 ### Ceph Toolbox
 
@@ -51,7 +73,7 @@ There is a bash function to call out to the Ceph toolbox POD, so "ceph status" w
 
 ### Triton Provider Key ID and Account
 
-During terraform plan or terraform apply, if you see the following error after entering your metallb_range and project_name...
+During terraform plan or terraform apply, if you see the following error:
 
     data.template_file.cc-k8s-worker: Refreshing state...
     data.template_file.cc-k8s-master: Refreshing state...
@@ -63,30 +85,16 @@ During terraform plan or terraform apply, if you see the following error after e
 
 ...obtain your Triton profile details using the following command...
 
-    cat ~/.triton/profiles.d/eu-staff-1.json
+```
+    cat ~/.triton/profiles.d/*.json
+```
 
 ...and then update the following variables in main.tf...
 
+```
     {
         "url": "",
         "account": "",
         "keyId": ""
     }
-
-### Internal Network vlan2800 error
-
-During terraform plan or terraform apply, if you see the following error...
-
-    data.triton_network.internal: Refreshing state...
-
-    Error: Error refreshing state: 1 error occurred:
-	    * data.triton_network.internal: 1 error occurred:
-	    * data.triton_network.internal: data.triton_network.internal: no matching Network with name "vlan2800" found
-	
-...check that you have a triton network attached using...
-
-    triton networks
-
-If this does not return a private LAN, contact IT Support. Otherwise, add your vLAN to networks.tf...
-
-    name = "vlan2804"
+```
