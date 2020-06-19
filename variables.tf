@@ -20,6 +20,11 @@ variable "internal_network" {
   type = string
 }
 
+# Internal IP Range E.g. "10.12.34.0/24"
+variable "internal_range" {
+  type = string
+}
+
 # Instance image name. E.g. ubuntu-certified-18.04
 variable "image" {
   type = string
