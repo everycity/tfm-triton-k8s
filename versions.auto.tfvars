@@ -15,11 +15,11 @@
 kubernetes_version = "1.18.2"
 calico_version = "3.13"
 metallb_version = "0.9.3"
-rook_version = "1.3.2"
-ceph_version = "15.2.1"
+rook_version = "1.3.5"
+ceph_version = "15.2.3"
 kured_version = "1.4.0"
 dashboard_version = "2.0.0"
-helm_version = "3.2.0"
+helm_version = "3.2.4"
 
 # Conservative choices, i.e. highest minor of previous major, as of 2020-05-02
 #kubernetes_version = "1.17.5"
