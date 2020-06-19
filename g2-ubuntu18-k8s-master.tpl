@@ -305,6 +305,11 @@ write_files:
     content: |
       # Lazy Human
       alias k="kubectl"
+      
+      # Enable tab completion
+      source <(kubectl completion bash)
+      complete -F __start_kubectl k
+      
       # Ain't nobody got time for typin' all that
       ceph() {
         TOOLS_POD=$(kubectl -n rook-ceph get pod -l "app=rook-ceph-tools" -o jsonpath='{.items[0].metadata.name}')
