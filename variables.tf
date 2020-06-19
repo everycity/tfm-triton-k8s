@@ -24,6 +24,7 @@ variable "internal_network" {
 variable "image" {
   type = string
   default = "ubuntu-certified-18.04"
+}
 
 # Master node instance package type. E.g. g1-virtualmachine-bhyve-4G
 variable "master_package" {

@@ -8,7 +8,7 @@ resource "triton_machine" "k8s-master" {
   firewall_enabled = true
 
   tags {
-    k8s-cluster = "${var.dns_suffix}"
+    k8s-cluster = var.dns_suffix
   }
 
   affinity = ["k8s-cluster!=${var.dns_suffix}"]
@@ -33,7 +33,7 @@ resource "triton_machine" "k8s-worker" {
   firewall_enabled = true
 
   tags {
-    k8s-cluster = "${var.dns_suffix}"
+    k8s-cluster = var.dns_suffix
   }
 
   affinity = ["k8s-cluster!=${var.dns_suffix}"]
