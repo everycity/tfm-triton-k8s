@@ -50,11 +50,19 @@ Variables must be specified unless there is a default.
 
 ## Triton account details
 
-You will need to edit main.tf and update the Triton provider authentication details. You can obtain these via:
+You will need to edit main.tf and update the Triton provider authentication details.
+
+If provisioning into your own account, you can obtain these via:
 
 ```
 cat ~/.triton/profiles.d/*.json
 ```
+
+## Terraform Cloud
+
+If using this in the Terraform Cloud, you will need to edit main.tf and uncomment the backend block, and specify the organization and workspace name.
+
+You'll also need to provide Triton key_material via the triton_ssh_private_key variable. This variable can be supplied securely within Terraform Cloud (don't use an environment variable, as these cannot contain newlines).
 
 ## Rook
 
