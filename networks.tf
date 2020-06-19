@@ -1,8 +1,8 @@
 data "triton_network" "external" {
-  name = "external"
+  name = var.external_network
 }
 
 data "triton_network" "internal" {
-  name = "vlan2800"
+  name = var.internal_network
 }
 
