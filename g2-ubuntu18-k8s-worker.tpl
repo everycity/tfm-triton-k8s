@@ -59,7 +59,11 @@ runcmd:
  - partprobe
  - resize2fs /dev/vda1
 
- # Fix hostname so internal IP is used instead of the external IP
+ # Fix hostname so x509 certificate matches server name
+ - echo "master.${dns_suffix}" > /etc/hostname
+ - hostname "master.${dns_suffix}"
+
+ # Fix /etc/hosts so internal IP is used instead of the external IP
  # https://github.com/kubernetes/kubeadm/issues/1987
  - echo $(hostname -i | xargs -n1 | grep ^10.) $(hostname) >> /etc/hosts
 
