@@ -179,20 +179,21 @@ apt:
         =0YYh
         -----END PGP PUBLIC KEY BLOCK-----
 
+# Disable automatic updates due to PXC and Rook/Ceph breaking
 write_files:
   - path: /etc/apt/apt.conf.d/10periodic
     content: |
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Download-Upgradeable-Packages "1";
       APT::Periodic::AutocleanInterval "7";
-      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::Unattended-Upgrade "0";
 
-  - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
-    content: |
-      [Timer]
-      OnCalendar=
-      OnCalendar=*-*-* 2:00
-      RandomizedDelaySec=4h
+#  - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
+#    content: |
+#      [Timer]
+#      OnCalendar=
+#      OnCalendar=*-*-* 2:00
+#      RandomizedDelaySec=4h
 
   - path: /etc/apt/apt.conf.d/80everycity
     content: |

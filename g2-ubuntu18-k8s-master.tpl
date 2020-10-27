@@ -94,13 +94,14 @@ runcmd:
  - kubectl apply -f /var/tmp/metallb-conf.yaml
  - kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 
- # Initialise Kured for automatic safe reboots of the cluster
- - wget -O /var/tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
- - echo "            - --reboot-days=sun" >> /tmp/kured.yaml
- - echo "            - --start-time=2am" >> /tmp/kured.yaml
- - echo "            - --end-time=8am" >> /tmp/kured.yaml
- - echo "            - --time-zone=Europe/London" >> /tmp/kured.yaml
- - kubectl apply -f /var/tmp/kured.yaml
+# This breaks Percona XtraDB cluster (PXC) and Rook Ceph - disable for now
+# # Initialise Kured for automatic safe reboots of the cluster
+# - wget -O /var/tmp/kured.yaml https://github.com/weaveworks/kured/releases/download/${kured_version}/kured-${kured_version}-dockerhub.yaml
+# - echo "            - --reboot-days=sun" >> /tmp/kured.yaml
+# - echo "            - --start-time=2am" >> /tmp/kured.yaml
+# - echo "            - --end-time=8am" >> /tmp/kured.yaml
+# - echo "            - --time-zone=Europe/London" >> /tmp/kured.yaml
+# - kubectl apply -f /var/tmp/kured.yaml
 
  # Initialise the Kubernetes Dashboard
  - kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v${dashboard_version}/aio/deploy/recommended.yaml
@@ -221,20 +222,21 @@ apt:
         =0YYh
         -----END PGP PUBLIC KEY BLOCK-----
 
+# Disabling automatic updates as these are breaking PXC and Rook/Ceph
 write_files:
   - path: /etc/apt/apt.conf.d/10periodic
     content: |
       APT::Periodic::Update-Package-Lists "1";
       APT::Periodic::Download-Upgradeable-Packages "1";
       APT::Periodic::AutocleanInterval "7";
-      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::Unattended-Upgrade "0";
 
-  - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
-    content: |
-      [Timer]
-      OnCalendar=
-      OnCalendar=*-*-* 2:00
-      RandomizedDelaySec=4h
+#  - path: /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
+#    content: |
+#      [Timer]
+#      OnCalendar=
+#      OnCalendar=*-*-* 2:00
+#      RandomizedDelaySec=4h
   - path: /etc/apt/apt.conf.d/80everycity
     content: |
       Unattended-Upgrade::Automatic-Reboot "false";
