@@ -7,7 +7,7 @@ resource "triton_machine" "k8s-master" {
 
   firewall_enabled = true
 
-  tags {
+  tags = {
     k8s-cluster = var.dns_suffix
   }
 
@@ -17,10 +17,14 @@ resource "triton_machine" "k8s-master" {
 
   lifecycle {
     ignore_changes = [
+      image,
       cloud_config
     ]
   }
 }
+
+output "master_hostname" { value = triton_machine.k8s-master.name }
+output "master_ips" {  value = triton_machine.k8s-master.ips }
 
 # Kubernetes workers
 resource "triton_machine" "k8s-worker" {
@@ -32,18 +36,25 @@ resource "triton_machine" "k8s-worker" {
 
   firewall_enabled = true
 
-  tags {
+  tags = {
     k8s-cluster = var.dns_suffix
   }
 
   affinity = ["k8s-cluster!=${var.dns_suffix}"]
 
-  cloud_config = data.template_file.cc-k8s-worker.rendered
+  cloud_config = data.template_file.cc-k8s-worker.*.rendered[count.index]
 
   lifecycle {
     ignore_changes = [
+      image,
       cloud_config
     ]
   }
 }
 
+output "worker_ips" {
+  value = {
+    for worker in triton_machine.k8s-worker:
+      worker.name => worker.ips
+  }
+}

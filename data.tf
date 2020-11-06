@@ -1,6 +1,7 @@
 data "template_file" "cc-k8s-master" {
-    template = file("${path.module}/g2-ubuntu18-k8s-master.tpl")
+    template = file("${path.module}/g2-ubuntu2004-k8s-master.tpl")
     vars = {
+      dns_suffix = var.dns_suffix
       metallb_range = var.metallb_range
       kubernetes_version = var.kubernetes_version
       calico_version = var.calico_version
@@ -14,8 +15,11 @@ data "template_file" "cc-k8s-master" {
 }
 
 data "template_file" "cc-k8s-worker" {
-    template = file("${path.module}/g2-ubuntu18-k8s-worker.tpl")
+    count = var.worker_count
+    template = file("${path.module}/g2-ubuntu2004-k8s-worker.tpl")
     vars = {
+      hostname = "worker${format("%d", count.index+1)}"
+      dns_suffix = var.dns_suffix
       metallb_range = var.metallb_range
       kubernetes_version = var.kubernetes_version
       calico_version = var.calico_version

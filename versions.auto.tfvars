@@ -11,22 +11,22 @@
 # - https://github.com/kubernetes/dashboard/releases
 # - https://github.com/helm/helm/releases
 
-# Bleeding edge choices, i.e. highest minor and highest major, as of 2020-05-02
-kubernetes_version = "1.18.2"
-calico_version = "3.13"
-metallb_version = "0.9.3"
-rook_version = "1.3.5"
-ceph_version = "15.2.3"
-kured_version = "1.4.0"
-dashboard_version = "2.0.0"
-helm_version = "3.2.4"
+# Bleeding edge choices, i.e. highest minor and highest major, as of 2020-11-06
+kubernetes_version = "1.19.3"
+calico_version = "3.16"
+metallb_version = "0.9.4"
+rook_version = "1.4.7"
+ceph_version = "15.2.5"
+kured_version = "1.5.0"
+dashboard_version = "2.0.4"
+helm_version = "3.4.0"
 
-# Conservative choices, i.e. highest minor of previous major, as of 2020-05-02
-#kubernetes_version = "1.17.5"
-#calico_version = "3.8"
+# Conservative choices, i.e. highest minor of previous major, as of 2020-11-06
+#kubernetes_version = "1.18.10"
+#calico_version = "3.15"
 #metallb_version = "0.8.3"
-#rook_version = "1.2.7"
-#ceph_version = "14.2.9"
-#kured_version = "1.4.0"
-#dashboard_version = "2.0.0"
-#helm_version = "3.1.3"
+#rook_version = "1.3.11"
+#ceph_version = "14.2.13"
+#kured_version = "1.4.5"
+#dashboard_version = "2.0.3"
+#helm_version = "3.3.4"

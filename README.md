@@ -6,7 +6,7 @@ Terraform code for spinning up k8s on Triton. Creates:
 
 It installs:
 
-- Ubuntu 18.04 with the 5.3 HWE Kernel (to avoid CephFS crashes)
+- Ubuntu 20.04
 - Docker as the CRI
 - Calico as the CNI
 - MetalLB for Load Balancing
@@ -42,7 +42,7 @@ Variables must be specified unless there is a default.
 | metallb_range          |                            | IP Range for MetalLB to use. Please speak to your network administrator. Takes the format x.x.x.x-y.y.y.y              |
 | external_network       |                            | External network name. E.g. "public"                                                                                   |
 | internal_network       |                            | Internal network name. E.g. "vlan1234"                                                                                 |
-| image                  | ubuntu-certified-18.04     | Instance image to provision with                                                                                       |
+| image                  | ubuntu-20.04               | Instance image to provision with                                                                                       |
 | master_package         | g1-virtualmachine-bhyve-4G | Master node instance package type                                                                                      |
 | worker_package         | g2-virtualmachine-bhyve-8G | Worker node instance package type                                                                                      |
 | worker_count           | 3                          | Worker node instance count                                                                                             |

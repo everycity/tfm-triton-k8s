@@ -25,10 +25,10 @@ variable "internal_range" {
   type = string
 }
 
-# Instance image name. E.g. ubuntu-certified-18.04
+# Instance image name. E.g. ubuntu-20.04
 variable "image" {
   type = string
-  default = "ubuntu-certified-18.04"
+  default = "ubuntu-20.04"
 }
 
 # Master node instance package type. E.g. g1-virtualmachine-bhyve-4G
