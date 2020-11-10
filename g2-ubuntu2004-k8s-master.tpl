@@ -96,6 +96,10 @@ runcmd:
  - mv /.kube /root/
 
 # Don't mount secondary disk
+disk_setup:
+
+fs_setup:
+
 mounts:
  - [ vdb, null ]
 

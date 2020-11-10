@@ -54,6 +54,10 @@ runcmd:
  - systemctl restart docker
 
 # Don't mount secondary disk
+disk_setup:
+
+fs_setup:
+
 mounts:
  - [ vdb, null ]
 
